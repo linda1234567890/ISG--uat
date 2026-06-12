@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISG标讯 UAT测试用例目录（优化版）</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #f0f4f8;
+    color: #1a2332;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #0f2744 0%, #1a4480 60%, #1e5799 100%);
+    padding: 28px 40px 22px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(15,39,68,0.35);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .header-badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #a8d4ff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .version-badge {
+    background: rgba(34,197,94,0.2);
+    border: 1px solid rgba(34,197,94,0.35);
+    color: #86efac;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+  .header h1 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .header-sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  /* Notice banner */
+  .notice-banner {
+    background: rgba(251,191,36,0.15);
+    border: 1px solid rgba(251,191,36,0.3);
+    border-radius: 6px;
+    padding: 7px 12px;
+    margin-bottom: 14px;
+    color: #fcd34d;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Controls bar */
+  .controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+  }
+  .search-input {
+    width: 100%;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    padding: 7px 12px 7px 34px;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .search-input::placeholder { color: rgba(255,255,255,0.4); }
+  .search-input:focus {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.4);
+  }
+
+  .filter-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.07);
+    transition: all 0.18s;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: rgba(255,255,255,0.45); color: #fff; background: rgba(255,255,255,0.13); }
+  .chip.active { background: #fff; border-color: #fff; color: #0f2744; }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex;
+    gap: 8px;
+    padding: 12px 40px;
+    background: #e8eef5;
+    border-bottom: 1px solid #d0dae6;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #4a6080;
+  }
+  .stat-num {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a4480;
+  }
+  .stat-sep { color: #c0cdd8; margin: 0 4px; }
+
+  /* Optimization note */
+  .opt-note {
+    background: #fff;
+    border: 1px solid #e2eaf3;
+    border-left: 3px solid #1a4480;
+    border-radius: 0 8px 8px 0;
+    padding: 10px 16px;
+    margin: 0 40px 0;
+    font-size: 12px;
+    color: #4a6080;
+    line-height: 1.8;
+  }
+  .opt-note strong { color: #1a2332; }
+
+  /* Main content */
+  .main { padding: 20px 40px 40px; }
+
+  /* Role section */
+  .role-section {
+    margin-bottom: 32px;
+  }
+  .role-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 0 2px;
+  }
+  .role-icon {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .role-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a2332;
+  }
+  .role-subtitle {
+    font-size: 11px;
+    color: #7a94b0;
+    margin-left: 2px;
+    font-weight: 400;
+  }
+  .role-count {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 12px;
+    margin-left: auto;
+  }
+
+  /* Category grouping within a role */
+  .cat-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0 2px;
+    margin: 14px 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cat-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2eaf3;
+  }
+
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 10px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e2eaf3;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+  .card:hover {
+    border-color: #b8cfe8;
+    box-shadow: 0 3px 12px rgba(26,68,128,0.08);
+    transform: translateY(-1px);
+  }
+  .card.expanded {
+    border-color: #1a4480;
+    box-shadow: 0 5px 20px rgba(26,68,128,0.12);
+  }
+
+  /* Core badge */
+  .core-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: #fef3c7;
+    color: #b45309;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+  .tc-id {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a2332;
+    line-height: 1.45;
+    flex: 1;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+  }
+  .meta-tag {
+    font-size: 10.5px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  /* Pending field note */
+  .field-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #f59e0b;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-top: 6px;
+  }
+
+  /* Expanded detail */
+  .card-detail {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eef2f7;
+  }
+  .card.expanded .card-detail { display: block; }
+
+  .detail-section {
+    margin-bottom: 10px;
+  }
+  .detail-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #7a94b0;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .detail-content {
+    font-size: 12.5px;
+    color: #2d4060;
+    line-height: 1.65;
+    white-space: pre-line;
+  }
+  .detail-content .field-tag {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 3px;
+    padding: 0 5px;
+    font-size: 11px;
+    margin: 1px;
+  }
+  .field-tbd {
+    display: inline-block;
+    background: #fff7ed;
+    color: #c2410c;
+    border-radius: 3px;
+    padding: 0 5px;
+    font-size: 11px;
+    border: 1px dashed #fed7aa;
+  }
+
+  /* Color themes per role */
+  .theme-0 .card::before { background: #3b82f6; }
+  .theme-0 .role-icon { background: #eff6ff; }
+  .theme-0 .tc-id { background: #eff6ff; color: #1d4ed8; }
+  .theme-0 .role-count { background: #dbeafe; color: #1d4ed8; }
+
+  .theme-1 .card::before { background: #8b5cf6; }
+  .theme-1 .role-icon { background: #f5f3ff; }
+  .theme-1 .tc-id { background: #f5f3ff; color: #6d28d9; }
+  .theme-1 .role-count { background: #ede9fe; color: #6d28d9; }
+
+  .theme-2 .card::before { background: #06b6d4; }
+  .theme-2 .role-icon { background: #ecfeff; }
+  .theme-2 .tc-id { background: #ecfeff; color: #0e7490; }
+  .theme-2 .role-count { background: #cffafe; color: #0e7490; }
+
+  .theme-3 .card::before { background: #f59e0b; }
+  .theme-3 .role-icon { background: #fffbeb; }
+  .theme-3 .tc-id { background: #fffbeb; color: #b45309; }
+  .theme-3 .role-count { background: #fef3c7; color: #b45309; }
+
+  .theme-4 .card::before { background: #10b981; }
+  .theme-4 .role-icon { background: #ecfdf5; }
+  .theme-4 .tc-id { background: #ecfdf5; color: #065f46; }
+  .theme-4 .role-count { background: #d1fae5; color: #065f46; }
+
+  .theme-5 .card::before { background: #ef4444; }
+  .theme-5 .role-icon { background: #fef2f2; }
+  .theme-5 .tc-id { background: #fef2f2; color: #b91c1c; }
+  .theme-5 .role-count { background: #fee2e2; color: #b91c1c; }
+
+  .theme-6 .card::before { background: #ec4899; }
+  .theme-6 .role-icon { background: #fdf2f8; }
+  .theme-6 .tc-id { background: #fdf2f8; color: #9d174d; }
+  .theme-6 .role-count { background: #fce7f3; color: #9d174d; }
+
+  .theme-7 .card::before { background: #64748b; }
+  .theme-7 .role-icon { background: #f8fafc; }
+  .theme-7 .tc-id { background: #f1f5f9; color: #334155; }
+  .theme-7 .role-count { background: #e2e8f0; color: #334155; }
+
+  .tag-s1 { background: #eff6ff; color: #3b82f6; }
+  .tag-s2 { background: #f0fdf4; color: #16a34a; }
+  .tag-s3 { background: #fdf4ff; color: #a855f7; }
+  .tag-s4 { background: #fff7ed; color: #ea580c; }
+  .tag-terminal { background: #f1f5f9; color: #64748b; }
+  .tag-extra { background: #fef3c7; color: #b45309; }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .hidden { display: none !important; }
+
+  .chevron {
+    margin-left: auto;
+    flex-shrink: 0;
+    color: #b0bec5;
+    transition: transform 0.2s;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  .card.expanded .chevron { transform: rotate(180deg); color: #1a4480; }
+
+  /* opt info bar */
+  .opt-bar {
+    background: #f0f7ff;
+    border-bottom: 1px solid #d0dae6;
+    padding: 10px 40px;
+    font-size: 11.5px;
+    color: #4a6080;
+    line-height: 1.7;
+  }
+  .opt-bar span { color: #1a4480; font-weight: 600; }
+
+  /* Role info panel */
+  .role-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2eaf3;
+    border-radius: 8px;
+  }
+  .role-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .role-info-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+  .role-info-value {
+    font-size: 12px;
+    color: #2d4060;
+    line-height: 1.5;
+  }
+  .role-info-link {
+    font-size: 12px;
+    color: #1a4480;
+    text-decoration: none;
+    word-break: break-all;
+  }
+  .role-info-link:hover { text-decoration: underline; }
+  .role-info-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background: #1a4480;
+    border-radius: 5px;
+    padding: 3px 10px;
+    text-decoration: none;
+    transition: background 0.15s;
+    width: fit-content;
+  }
+  .role-info-download:hover { background: #0f2744; }
+
+  @media (max-width: 640px) {
+    .header { padding: 18px 16px 14px; }
+    .stats-bar, .opt-bar { padding: 10px 16px; }
+    .opt-note { margin: 0 16px; }
+    .main { padding: 14px 16px 32px; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .role-info { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Result status styles */
+  .result-pass { color: #16a34a !important; }
+  .result-fail { color: #dc2626 !important; }
+  .result-block { color: #d97706 !important; }
+  .result-skip { color: #64748b !important; }
+
+  .result-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eef2f7;
+    flex-wrap: wrap;
+  }
+  .result-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #7a94b0;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .result-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    background: #f1f5f9;
+    color: #64748b;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .result-btn:hover { opacity: 0.85; }
+  .result-btn.active-pass { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+  .result-btn.active-fail { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+  .result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .badge-pass { background: #dcfce7; color: #16a34a; }
+  .badge-fail { background: #fee2e2; color: #dc2626; }
+  .badge-pending { background: #f1f5f9; color: #94a3b8; }
+
+  /* Remark textarea */
+  .remark-area {
+    width: 100%;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #2d4060;
+    border: 1px solid #e2eaf3;
+    border-radius: 5px;
+    padding: 6px 8px;
+    resize: vertical;
+    min-height: 40px;
+    font-family: inherit;
+    background: #fafbfc;
+    outline: none;
+    transition: border-color 0.15s;
+    display: none;
+  }
+  .remark-area.visible { display: block; }
+  .remark-area:focus { border-color: #1a4480; background: #fff; }
+
+  /* Storage status */
+  .storage-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-left: auto;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+  }
+  .storage-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #94a3b8;
+    flex-shrink: 0;
+  }
+  .storage-dot.ok { background: #4ade80; }
+  .storage-dot.saving { background: #fbbf24; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* Export button */
+  .export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.1);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .export-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span class="header-badge">UAT</span>
+        <span class="version-badge">优化版 v2</span>
+        <h1>ISG 智能标讯 · 测试用例目录</h1>
+      </div>
+      <div class="header-sub" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span>点击用例卡片展开详情 · 支持按角色、场景筛选和关键词搜索</span>
+        <span class="storage-status" id="storageStatus"><span class="storage-dot" id="storageDot"></span><span id="storageText">连接中…</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="notice-banner">
+    ⚠️ 标讯展示字段清单待与 IT 最终确认后补充，字段一致性核查为 UAT 验收标准之一
+  </div>
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="white"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" id="searchInput" placeholder="搜索用例ID、标题…" oninput="filterAll()">
+    </div>
+    <div class="filter-group" id="roleFilters"></div>
+    <button class="export-btn" onclick="exportResults()">📊 导出结果</button>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-item"><span class="stat-num" id="countShown">—</span>&nbsp;条用例</div>
+  <span class="stat-sep">·</span>
+  <div class="stat-item"><span class="stat-num">8</span>&nbsp;个角色</div>
+  <span class="stat-sep">·</span>
+  <div class="stat-item">🌟 <span class="stat-num" id="countCore">—</span>&nbsp;核心三项</div>
+  <span class="stat-sep">·</span>
+  <div class="stat-item">✅ <span class="stat-num result-pass" id="countPass">0</span>&nbsp;通过</div>
+  <span class="stat-sep">·</span>
+  <div class="stat-item">❌ <span class="stat-num result-fail" id="countFail">0</span>&nbsp;失败</div>
+  <span class="stat-sep">·</span>
+  <div class="stat-item">⬜ <span class="stat-num" id="countPending" style="color:#94a3b8">—</span>&nbsp;待测试</div>
+</div>
+
+
+
+<div class="main" id="mainContent"></div>
+
+<script>
+// ============================================================
+// DATA — optimized UAT test cases
+// ============================================================
+const DATA = [
+
+  // ── 总部运营 ────────────────────────────────────────────
+  {role:"总部运营", tc_id:"TC-HQ-001", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"总部运营-查看标讯列表及详情（字段核查）",
+   precondition:"用户已登录，具有总部运营角色权限，标讯数据已入库",
+   data_needed:"总部运营测试账号；多条标讯测试数据；【待IT确认】字段清单",
+   steps:"1. 总部运营账号登录，进入标讯列表\n2. 确认列表字段与IT确认字段清单一致\n3. 点击任意标讯查看详情页\n4. 逐项核对详情页字段与字段清单",
+   expected:"1. 标讯列表正常展示，可见全量数据（总部权限）\n2. 列表字段与约定清单完全一致\n3. 详情页字段完整，与约定清单一致\n4. 无多余字段、无缺漏字段",
+   field_note:"列表+详情字段清单待IT最终确认",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-HQ-002", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"总部运营-单条/批量下载标讯数据",
+   precondition:"总部运营账号已登录，标讯列表已展示",
+   data_needed:"多条不同属性的标讯测试数据；总部运营测试账号",
+   steps:"1. 选择单条标讯点击下载\n2. 选择多条标讯执行批量下载\n3. 打开下载文件，核对内容与列表一致\n4. 确认下载文件格式正确（xlsx/csv）",
+   expected:"1. 单条下载成功，格式正确\n2. 批量下载成功，数据量与列表选择一致\n3. 下载内容包含约定字段，无额外字段",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-001", scenario:"S1 标讯接入与管理", cat:"上传与管理",
+   title:"标讯上传-正常上传有效文件",
+   precondition:"用户已登录系统，具有标讯上传权限",
+   data_needed:"有效格式标讯文件（xlsx/csv，字段完整）；具有上传权限的测试账号",
+   steps:"1. 进入标讯上传页面\n2. 选择符合格式要求的标讯文件\n3. 点击上传按钮",
+   expected:"1. 文件上传成功，系统显示上传成功提示\n2. 上传记录在列表中可见",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-008", scenario:"S1 标讯接入与管理", cat:"上传与管理",
+   title:"标讯数据校验-必填字段完整时校验通过",
+   precondition:"标讯文件已上传，进入数据校验环节",
+   data_needed:"包含所有必填字段的标讯数据文件；【待IT确认】必填字段定义",
+   steps:"1. 上传包含所有必填字段的标讯数据\n2. 触发数据校验流程",
+   expected:"1. 校验通过，数据流转到下一节点\n2. 校验日志显示通过状态",
+   field_note:"必填字段定义需与IT确认",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-018", scenario:"S1 标讯接入与管理", cat:"看板筛选",
+   title:"标讯看板-多条件组合筛选",
+   precondition:"标讯列表有足够多条不同属性的测试数据",
+   data_needed:"含不同状态、区域、产品类别的标讯测试数据各若干条",
+   steps:"1. 同时设置：状态 + 区域 + 产品类别\n2. 执行筛选\n3. 清空筛选条件后重新查看",
+   expected:"1. 筛选结果仅展示满足所有条件的标讯\n2. 清空条件后返回全量列表",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-022", scenario:"S2 标讯分派与流转", cat:"分派管理",
+   title:"标讯手工下发-重复下发被拦截",
+   precondition:"标讯当前状态为「已下发」",
+   data_needed:"状态为「已下发」的标讯测试数据",
+   steps:"1. 找到状态为「已下发」的标讯\n2. 再次点击下发按钮",
+   expected:"1. 系统识别当前状态不允许重复下发\n2. 操作被拦截，标讯状态不变",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-023", scenario:"S2 标讯分派与流转", cat:"分派管理",
+   title:"金额阈值-≥50万触发自动下发",
+   precondition:"标讯金额≥500000",
+   data_needed:"金额≥50万的标讯测试数据；【待确认】50万是否含等于",
+   steps:"1. 导入金额≥50万的标讯\n2. 触发分派流程\n3. 查看系统处理路径",
+   expected:"1. 系统按≥50万规则触发自动分派路径\n2. 处理路径与产品设计规则一致",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-024", scenario:"S2 标讯分派与流转", cat:"分派管理",
+   title:"金额阈值-<50万不触发自动下发",
+   precondition:"标讯金额 < 50万",
+   data_needed:"金额<50万的标讯测试数据（建议取49.99万边界值）",
+   steps:"1. 导入金额<50万的标讯\n2. 触发分派流程\n3. 检查系统是否触发自动通知",
+   expected:"1. 系统不触发自动下发邮件通知\n2. 标讯进入待手动分配池\n3. 日志记录金额未达阈值",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-027", scenario:"S2 标讯分派与流转", cat:"自动分派规则",
+   title:"自动分派-B3类标讯正确分配给IS销售",
+   precondition:"UCP对撞规则已配置，B3类标讯数据已入库",
+   data_needed:"B3类标讯测试数据；UCP中对应IS锁定人账号；【待IT确认】B3判定逻辑",
+   steps:"1. 导入B3类标讯，触发自动分配\n2. 查看分配结果",
+   expected:"1. B3类标讯自动分配给UCP中IS锁定人\n2. 不误分到OS团队\n3. 分配成功后状态置为「已分派」",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-028", scenario:"S2 标讯分派与流转", cat:"自动分派规则",
+   title:"自动分派-B1/B2类标讯正确分配给OS销售",
+   precondition:"UCP对撞规则已配置，B1/B2类标讯数据已入库",
+   data_needed:"B1/B2类标讯测试数据；UCP中对应OS锁定人账号",
+   steps:"1. 导入B1/B2类标讯，触发自动分配\n2. 查看分配结果",
+   expected:"1. B1/B2类标讯自动分配给UCP中OS锁定人\n2. 分配规则与UCP对撞结果一致\n3. 分配成功后状态置为「已分派」",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"总部运营", tc_id:"TC-035", scenario:"S2 标讯分派与流转", cat:"自动分派规则",
+   title:"自动分派-找不到锁定人时邮件通知交管",
+   precondition:"标讯数据已入库，UCP对撞后无法匹配到锁定销售",
+   data_needed:"无UCP锁定人的标讯测试数据；交管测试账号邮箱；邮件服务可用",
+   steps:"1. 导入标讯数据，触发自动分派\n2. UCP对撞后系统找不到对应锁定人\n3. 查看系统行为",
+   expected:"1. 标讯状态置为「待分派」\n2. 系统向交管发送邮件通知\n3. 有完整日志记录",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  // ── 大区Leader ──────────────────────────────────────────
+  {role:"大区Leader", tc_id:"TC-DQ-001", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"大区Leader-查看下辖多个战区标讯列表及详情",
+   precondition:"用户具有大区Leader角色，下辖多个战区均有标讯数据",
+   data_needed:"大区Leader测试账号；下辖至少2个战区的标讯测试数据；字段清单（待IT确认）",
+   steps:"1. 大区Leader账号登录，进入标讯功能\n2. 查看标讯列表，确认可见范围覆盖下辖所有战区\n3. 点击任意标讯查看详情页\n4. 核对字段与约定清单一致",
+   expected:"1. 标讯列表显示下辖所有战区数据汇总\n2. 不显示非管辖战区的数据\n3. 详情页字段与约定字段清单一致",
+   field_note:"字段清单待IT确认",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"大区Leader", tc_id:"TC-DQ-002", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"大区Leader-下载标讯数据（范围限下辖战区）",
+   precondition:"用户具有大区Leader角色，下辖战区有标讯数据",
+   data_needed:"大区Leader测试账号；下辖战区标讯测试数据",
+   steps:"1. 大区Leader登录，进入标讯列表\n2. 执行下载操作（单条+批量均验证）",
+   expected:"1. 下载成功，格式正确\n2. 下载内容仅包含下辖战区范围内标讯\n3. 不包含非管辖战区数据",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  // ── 战区Leader ──────────────────────────────────────────
+  {role:"战区Leader", tc_id:"TC-ZQ-001", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"战区Leader-查看本战区标讯列表及详情（字段核查）",
+   precondition:"用户具有战区Leader角色",
+   data_needed:"战区Leader测试账号；本战区标讯测试数据；字段清单（待IT确认）",
+   steps:"1. 战区Leader账号登录，进入标讯列表\n2. 确认列表仅显示本战区数据\n3. 点击任意标讯查看详情\n4. 核对详情字段与约定清单一致\n5. 尝试访问他战区标讯（应被拦截）",
+   expected:"1. 仅显示本战区标讯\n2. 详情页字段与约定清单一致\n3. 访问其他战区时被拦截",
+   field_note:"字段清单待IT确认",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"战区Leader", tc_id:"TC-ZQ-002", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"战区Leader-下载本战区标讯数据",
+   precondition:"用户具有战区Leader角色，本战区有标讯数据",
+   data_needed:"战区Leader测试账号；本战区标讯测试数据",
+   steps:"1. 战区Leader账号登录，进入标讯列表\n2. 执行单条及批量下载操作",
+   expected:"1. 下载成功，格式正确\n2. 下载内容仅包含本战区标讯\n3. 不包含其他战区数据",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  // ── 战区销管 ────────────────────────────────────────────
+  // 说明：战区销管基础查看/下载与战区Leader内容相同，额外有分派操作
+  {role:"战区销管", tc_id:"TC-ZXG-001", scenario:"S1 标讯接入与管理", cat:"基础三项（同战区Leader）",
+   title:"战区销管-查看本战区标讯列表及详情（字段核查）",
+   precondition:"用户具有战区销管角色，本战区有标讯数据",
+   data_needed:"战区销管测试账号；本战区标讯测试数据；字段清单（待IT确认）",
+   steps:"1. 战区销管登录，进入标讯列表\n2. 确认列表仅显示本战区范围内标讯\n3. 点击任意标讯查看详情，核对字段清单\n4. 尝试访问其他战区标讯（应被拦截）",
+   expected:"1. 列表仅展示本战区范围内标讯（与战区Leader可见范围一致）\n2. 详情字段与约定清单一致\n3. 访问其他战区标讯时被拦截",
+   field_note:"字段与战区Leader一致，待IT确认",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"战区销管", tc_id:"TC-ZXG-002", scenario:"S1 标讯接入与管理", cat:"基础三项（同战区Leader）",
+   title:"战区销管-下载本战区标讯数据",
+   precondition:"用户具有战区销管角色，本战区有标讯数据",
+   data_needed:"战区销管测试账号；本战区标讯测试数据",
+   steps:"1. 战区销管登录，进入标讯列表\n2. 执行单条及批量下载操作",
+   expected:"1. 下载成功，格式正确\n2. 数据仅包含本战区标讯（与战区Leader一致）",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"战区销管", tc_id:"TC-033", scenario:"S2 标讯分派与流转", cat:"额外：分派操作",
+   title:"战区销管-手动填写ITcode分派标讯（战区Leader无此操作）",
+   precondition:"标讯处于「待分派」状态；战区销管已收到邮件通知；用户具有分配权限",
+   data_needed:"处于「待分派」状态的标讯；目标销售的ITcode；战区销管测试账号；邮件服务可用",
+   steps:"1. 战区销管登录，进入待分派标讯\n2. 输入目标销售ITcode\n3. 提交分配操作\n4. 确认被分配销售收到通知",
+   expected:"1. 标讯成功分配给指定销售，状态变为「已分派」\n2. 被分配销售收到邮件通知\n3. 销售端可查看该标讯",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  // ── 区域销管（新增） ────────────────────────────────────
+  {role:"区域销管", tc_id:"TC-QXG-001", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"区域销管-查看本区域标讯列表及详情（字段核查）",
+   precondition:"用户具有区域销管角色，区域内有标讯数据",
+   data_needed:"区域销管测试账号；本区域标讯测试数据；字段清单（待IT确认）",
+   steps:"1. 区域销管账号登录，进入标讯列表\n2. 确认列表仅显示本区域内标讯\n3. 点击任意标讯查看详情\n4. 核对字段与约定清单一致（与产品经理对比：字段相同、数据范围不同）",
+   expected:"1. 列表仅显示本区域标讯\n2. 字段与约定清单一致\n3. 不显示非本区域数据",
+   field_note:"字段与产品经理一致，数据范围按区域权限过滤，待IT确认",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"区域销管", tc_id:"TC-QXG-002", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"区域销管-下载本区域标讯数据",
+   precondition:"用户具有区域销管角色，区域内有标讯数据",
+   data_needed:"区域销管测试账号；本区域标讯测试数据",
+   steps:"1. 区域销管登录，进入标讯列表\n2. 执行单条及批量下载",
+   expected:"1. 下载成功，格式正确\n2. 下载内容仅包含本区域范围内标讯",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  // ── 产品经理 ────────────────────────────────────────────
+  // 说明：case类似区域销管，但可见数据为负责产品相关标讯（跨区域），而非按区域过滤
+  {role:"产品经理", tc_id:"TC-PM-001", scenario:"S4 智能解析与推荐", cat:"基础三项（类似区域销管，数据范围不同）",
+   title:"产品经理-查看负责产品相关标讯列表及详情",
+   precondition:"用户具有产品经理角色，标讯数据已完成产品标签提取",
+   data_needed:"产品经理测试账号；含产品标签的标讯数据；【待确认】标签字段范围与产品确认",
+   steps:"1. 产品经理账号登录，进入标讯功能\n2. 查看列表，确认仅显示负责产品相关标讯（不按区域过滤）\n3. 点击标讯查看详情，核对字段\n4. 与区域销管对比：字段结构相同，但数据范围按产品维度过滤",
+   expected:"1. 显示与负责产品相关的标讯（不限区域）\n2. 详情页字段与约定清单一致\n3. 不显示与负责产品无关的标讯\n4. 数据范围逻辑：产品维度 vs 区域销管的区域维度",
+   field_note:"字段与区域销管一致，数据范围逻辑不同，待IT确认",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"产品经理", tc_id:"TC-PM-002", scenario:"S4 智能解析与推荐", cat:"基础三项（类似区域销管，数据范围不同）",
+   title:"产品经理-下载负责产品相关标讯数据",
+   precondition:"用户具有产品经理角色",
+   data_needed:"产品经理测试账号；含不同产品标签的标讯数据",
+   steps:"1. 产品经理登录，进入标讯功能\n2. 执行单条及批量下载",
+   expected:"1. 下载成功，格式正确\n2. 下载内容仅为负责产品相关标讯\n3. 不包含无关产品的标讯",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  // ── 行业经理 ────────────────────────────────────────────
+  {role:"行业经理", tc_id:"TC-HYJ-001", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"行业经理-查看相关标讯列表及详情",
+   precondition:"用户具有行业经理角色，有相关标讯数据",
+   data_needed:"行业经理测试账号；相关标讯测试数据；字段清单（待IT确认）",
+   steps:"1. 行业经理账号登录，进入标讯功能\n2. 查看标讯列表，确认可见范围符合角色权限\n3. 点击标讯查看详情，核对字段与约定清单",
+   expected:"1. 标讯列表正常展示，范围符合角色权限\n2. 详情字段与约定清单一致",
+   field_note:"字段清单待IT确认",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"行业经理", tc_id:"TC-HYJ-002", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"行业经理-下载标讯数据",
+   precondition:"用户具有行业经理角色，有相关标讯数据",
+   data_needed:"行业经理测试账号；相关标讯测试数据",
+   steps:"1. 行业经理登录，进入标讯列表\n2. 执行下载操作",
+   expected:"1. 下载成功，格式正确\n2. 下载内容符合角色权限范围",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"行业经理", tc_id:"TC-036", scenario:"S2 标讯分派与流转", cat:"邮件通知",
+   title:"行业经理-收到待分派标讯邮件通知",
+   precondition:"标讯处于「待分派」状态；邮件服务正常",
+   data_needed:"处于待分派状态的标讯；行业经理测试账号邮箱；邮件服务正常",
+   steps:"1. 标讯进入待分派状态后系统自动发送邮件给行业经理\n2. 行业经理查收邮件，确认内容完整\n3. 检查邮件中跳转链接是否正常",
+   expected:"1. 行业经理成功收到待分派邮件\n2. 邮件内容完整，包含核心信息及操作入口链接\n3. 点击链接可直达标讯详情页",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  // ── AR (IS/OS) ──────────────────────────────────────────
+  {role:"AR (IS、OS)", tc_id:"TC-AR-001", scenario:"S3 AR标讯处理", cat:"基础三项",
+   title:"AR(IS/OS)-查看已分配标讯列表及详情（PC+APP）",
+   precondition:"销售账号已有标讯分配",
+   data_needed:"AR测试账号（IS/OS各一个）；已分配标讯若干条；PC端与APP端均可访问；字段清单（待IT确认）",
+   steps:"1. 销售账号分别登录PC端和APP端\n2. 进入「我的标讯」及「待跟进标讯」入口\n3. 点击标讯查看详情\n4. 核对字段与约定清单一致",
+   expected:"1. 显示分配给本人的标讯列表\n2. 详情字段完整，与约定清单一致\n3. 不显示其他销售的标讯\n4. APP端展示效果符合移动端设计",
+   field_note:"字段清单待IT确认",
+   terminal:"销售通 PC端、APP端", result:"待测试"},
+
+  {role:"AR (IS、OS)", tc_id:"TC-AR-002", scenario:"S3 AR标讯处理", cat:"基础三项",
+   title:"AR(IS/OS)-下载已分配标讯数据",
+   precondition:"销售账号已有标讯分配，PC端已登录",
+   data_needed:"AR测试账号；已分配标讯",
+   steps:"1. AR登录PC端，进入标讯列表\n2. 执行单条及批量下载操作",
+   expected:"1. 下载成功，格式正确\n2. 下载内容仅为分配给本人的标讯",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"AR (IS、OS)", tc_id:"TC-040", scenario:"S3 AR标讯处理", cat:"功能操作",
+   title:"AR-查看标讯一纸通内容",
+   precondition:"标讯一纸通功能已就绪，销售已有标讯分配",
+   data_needed:"已分配给AR的标讯；【待确认】AI分析内容字段范围需与产品确认",
+   steps:"1. 销售登录，进入标讯详情\n2. 点击「深度思考/一纸通」功能",
+   expected:"1. 正确展示AI生成的标讯深度分析内容\n2. 包含客户画像、历史案例关联、产品建议等\n3. 加载时间合理",
+   terminal:"销售通 PC端、APP端", result:"待测试"},
+
+  {role:"AR (IS、OS)", tc_id:"TC-044", scenario:"S3 AR标讯处理", cat:"功能操作",
+   title:"反馈无商机-有/无ISG产品均可提交",
+   precondition:"AR用户已登录，标讯已分配给该用户",
+   data_needed:"已分配给AR的标讯；AR测试账号",
+   steps:"1. 进入标讯详情页，点击「反馈无商机」\n2. 分别测试「是否有ISG产品」选「是」和「否」\n3. 选择无商机原因后提交",
+   expected:"1. 反馈成功提交\n2. 标讯状态更新为「已放弃」\n3. 系统记录反馈内容（含ISG产品标记和无商机原因）",
+   terminal:"销售通 PC端、APP端", result:"待测试"},
+
+  {role:"AR (IS、OS)", tc_id:"TC-047", scenario:"S3 AR标讯处理", cat:"功能操作",
+   title:"标讯关联已有商机-成功关联SA中存在的商机",
+   precondition:"AR用户已登录，SA系统中存在目标商机",
+   data_needed:"AR测试账号；SA系统中已存在目标商机（商机ID可查）",
+   steps:"1. 打开标讯详情页\n2. 点击「关联商机」入口\n3. 在SA商机列表中搜索并选择目标商机\n4. 确认关联操作",
+   expected:"1. 成功将标讯与已有商机关联\n2. 标讯详情页显示已关联商机信息\n3. SA商机信息同步更新标讯来源字段",
+   terminal:"销售通 PC端、APP端", result:"待测试"},
+
+  {role:"AR (IS、OS)", tc_id:"TC-055", scenario:"S3 AR标讯处理", cat:"功能操作",
+   title:"新建商机-有CDBID时系统预填充信息后创建成功",
+   precondition:"AR用户已登录，标讯已分配，用户名下客户有CDBID",
+   data_needed:"AR测试账号；名下客户具有CDBID；已分配标讯",
+   steps:"1. 进入标讯详情页\n2. 点击「反馈有商机」→「新建商机」\n3. 确认系统预填充信息\n4. 填写必填字段后确认创建",
+   expected:"1. 商机创建成功，返回商机ID\n2. 标讯与新商机建立双向关联\n3. 标讯状态更新为「已转化」",
+   terminal:"销售通 PC端、APP端", result:"待测试"},
+
+  // ── 纵队Leader ──────────────────────────────────────────
+  {role:"纵队Leader", tc_id:"TC-ZD-001", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"纵队Leader-查看本纵队标讯列表及详情（字段核查）",
+   precondition:"用户具有纵队Leader角色",
+   data_needed:"纵队Leader测试账号；本纵队标讯测试数据；字段清单（待IT确认）",
+   steps:"1. 纵队Leader账号登录，进入标讯列表\n2. 确认仅显示本纵队范围内标讯\n3. 点击任意标讯查看详情，核对字段清单",
+   expected:"1. 仅显示本纵队范围内标讯\n2. 详情字段完整，与约定清单一致\n3. 不显示其他纵队数据",
+   field_note:"字段清单待IT确认",
+   terminal:"销售通 PC端", result:"待测试"},
+
+  {role:"纵队Leader", tc_id:"TC-ZD-002", scenario:"S1 标讯接入与管理", cat:"基础三项",
+   title:"纵队Leader-下载本纵队标讯数据",
+   precondition:"用户具有纵队Leader角色，本纵队有标讯数据",
+   data_needed:"纵队Leader测试账号；本纵队标讯测试数据",
+   steps:"1. 纵队Leader登录，进入标讯列表\n2. 选择标讯并执行下载",
+   expected:"1. 下载成功，格式正确\n2. 下载内容仅包含本纵队范围内标讯\n3. 不包含其他纵队数据",
+   terminal:"销售通 PC端", result:"待测试"},
+
+];
+
+// ============================================================
+const ROLES = ['全部','总部运营','大区Leader','战区Leader','战区销管','区域销管','行业经理','AR (IS、OS)','纵队Leader','产品经理'];
+const ROLE_ICONS = ['🔍','🏢','🗺️','⚔️','📊','📋','🏭','👤','📋','💼'];
+const SCENARIOS = [];
+
+// 角色能力与测试信息
+const ROLE_META = {
+  '总部运营': {
+    abilities: '全量标讯查看、上传管理、数据校验、看板筛选、批量下载',
+    testers: '待填写',
+    testUrl: 'https://待填写',
+    dataDownload: '#'
+  },
+  '大区Leader': {
+    abilities: '查看本大区全量标讯列表及详情、下载本大区标讯数据',
+    testers: '待填写',
+    testUrl: 'https://待填写',
+    dataDownload: '#'
+  },
+  '战区Leader': {
+    abilities: '查看本战区标讯列表及详情、下载本战区标讯数据',
+    testers: '待填写',
+    testUrl: 'https://待填写',
+    dataDownload: '#'
+  },
+  '战区销管': {
+    abilities: '查看本战区标讯、分派标讯至AR、发送邮件通知、下载标讯数据',
+    testers: '待填写',
+    testUrl: 'https://待填写',
+    dataDownload: '#'
+  },
+  '区域销管': {
+    abilities: '查看本区域标讯列表及详情、下载本区域标讯数据',
+    testers: '待填写',
+    testUrl: 'https://待填写',
+    dataDownload: '#'
+  },
+  '行业经理': {
+    abilities: '查看相关标讯列表及详情、下载标讯数据、接收待分派邮件通知',
+    testers: '待填写',
+    testUrl: 'https://待填写',
+    dataDownload: '#'
+  },
+  'AR (IS、OS)': {
+    abilities: '查看已分配标讯（PC+APP）、下载标讯、查看一纸通、关联/新建商机、反馈商机',
+    testers: '待填写',
+    testUrl: 'https://待填写',
+    dataDownload: '#'
+  },
+  '纵队Leader': {
+    abilities: '查看本纵队标讯列表及详情、下载本纵队标讯数据',
+    testers: '待填写',
+    testUrl: 'https://待填写',
+    dataDownload: '#'
+  },
+  '产品经理': {
+    abilities: '查看负责产品相关标讯列表及详情、下载产品维度标讯数据',
+    testers: '待填写',
+    testUrl: 'https://待填写',
+    dataDownload: '#'
+  }
+};
+
+// ============================================================
+// CONFIG — 填写你的 Google Apps Script Web App URL
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw_DoUuj1Dh6O1rXv2wU2GkW7NEF-uNNa8fdqzOk1PHqPWHpPTk_IShI6Ihcr886PBT/exec';
+// 说明：部署 Google Apps Script 后将 Web App URL 替换到上方
+// 详见文件末尾注释
+
+// ============================================================
+// STATE
+// ============================================================
+let results = {};   // { tc_id: { status:'pass'|'fail'|'', remark:'' } }
+let saveQueue = {}; // pending writes
+let saveTimer = null;
+
+// ── Storage status indicator ──────────────────────────────
+function setStorageStatus(state) {
+  const dot = document.getElementById('storageDot');
+  const txt = document.getElementById('storageText');
+  if (!dot || !txt) return;
+  if (state === 'ok')     { dot.className='storage-dot ok';     txt.textContent='已同步 Google Sheets'; }
+  else if (state==='saving') { dot.className='storage-dot saving'; txt.textContent='同步中…'; }
+  else if (state==='err') { dot.className='storage-dot';        txt.textContent='同步失败（已本地缓存）'; }
+  else if (state==='cfg') { dot.className='storage-dot';        txt.textContent='未配置 GAS URL'; }
+  else                    { dot.className='storage-dot';        txt.textContent=state; }
+}
+
+// ── Load all results from GAS on startup ─────────────────
+async function loadResults() {
+  if (!GAS_URL) {
+    setStorageStatus('cfg');
+    // fallback: localStorage
+    try { const ls = localStorage.getItem('uat-results'); if(ls) results = JSON.parse(ls); } catch(e){}
+    updateStats(); return;
+  }
+  setStorageStatus('同步中…');
+  try {
+    const res = await fetch(GAS_URL + '?action=getAll', { method:'GET' });
+    const data = await res.json();
+    if (data && data.results) results = data.results;
+    setStorageStatus('ok');
+  } catch(e) {
+    setStorageStatus('err');
+    try { const ls = localStorage.getItem('uat-results'); if(ls) results = JSON.parse(ls); } catch(e2){}
+  }
+  updateStats();
+}
+
+// ── Write one row to GAS (debounced) ─────────────────────
+async function flushSave() {
+  if (!GAS_URL) {
+    try { localStorage.setItem('uat-results', JSON.stringify(results)); } catch(e){}
+    return;
+  }
+  const payload = Object.assign({}, saveQueue);
+  saveQueue = {};
+  setStorageStatus('saving');
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action:'upsertRows', rows: payload })
+    });
+    localStorage.setItem('uat-results', JSON.stringify(results)); // local mirror
+    setStorageStatus('ok');
+  } catch(e) {
+    setStorageStatus('err');
+    // re-queue
+    Object.assign(saveQueue, payload);
+    try { localStorage.setItem('uat-results', JSON.stringify(results)); } catch(e2){}
+  }
+}
+
+function scheduleSave(tcId) {
+  saveQueue[tcId] = results[tcId];
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flushSave, 900);
+}
+
+// ── Badge helpers ─────────────────────────────────────────
+function getBadge(val) {
+  if (val === 'pass') return '<span class="result-badge badge-pass">✅ 通过</span>';
+  if (val === 'fail') return '<span class="result-badge badge-fail">❌ 失败</span>';
+  return '<span class="result-badge badge-pending">待测试</span>';
+}
+
+// ── Set result on button click ────────────────────────────
+function setResult(tcId, status) {
+  if (!results[tcId]) results[tcId] = { status:'', remark:'' };
+  results[tcId].status = (results[tcId].status === status) ? '' : status; // toggle
+  scheduleSave(tcId);
+
+  const card = document.getElementById('card-' + tcId);
+  if (card) {
+    const newVal = results[tcId].status;
+    card.querySelectorAll('.result-btn').forEach(b => {
+      b.className = 'result-btn';
+      if (newVal === 'pass' && b.dataset.val === 'pass') b.className = 'result-btn active-pass';
+      if (newVal === 'fail' && b.dataset.val === 'fail') b.className = 'result-btn active-fail';
+    });
+    const title = card.querySelector('.card-title');
+    if (title) {
+      title.querySelectorAll('.result-badge').forEach(b => b.remove());
+      title.insertAdjacentHTML('beforeend', getBadge(newVal));
+    }
+    const remark = document.getElementById('remark-' + tcId);
+    if (remark) remark.classList.toggle('visible', !!newVal);
+  }
+  updateStats();
+}
+
+// ── Save remark ───────────────────────────────────────────
+function saveRemark(tcId, val) {
+  if (!results[tcId]) results[tcId] = { status:'', remark:'' };
+  results[tcId].remark = val;
+  scheduleSave(tcId);
+}
+
+// ── Stats bar ─────────────────────────────────────────────
+function updateStats() {
+  let pass=0, fail=0, pending=0;
+  const total = DATA.length;
+  DATA.forEach(d => {
+    const s = (results[d.tc_id] || {}).status;
+    if (s === 'pass') pass++;
+    else if (s === 'fail') fail++;
+    else pending++;
+  });
+  const el = id => document.getElementById(id);
+  if(el('countPass'))    el('countPass').textContent    = pass;
+  if(el('countFail'))    el('countFail').textContent    = fail;
+  if(el('countPending')) el('countPending').textContent = pending;
+}
+
+// ── Export CSV ────────────────────────────────────────────
+function exportResults() {
+  const rows = [['用例ID','标题','角色','场景','测试结果','备注']];
+  DATA.forEach(d => {
+    const r = results[d.tc_id] || {};
+    const statusMap = { pass:'通过', fail:'失败', '':'待测试' };
+    rows.push([d.tc_id, d.title, d.role, d.scenario||'', statusMap[r.status||'']||'待测试', r.remark||'']);
+  });
+  const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ISG_UAT测试结果_' + new Date().toLocaleDateString('zh-CN').replace(/\//g,'-') + '.csv';
+  a.click();
+}
+
+let activeRole = '全部';
+
+function buildFilters() {
+  const rf = document.getElementById('roleFilters');
+  ROLES.forEach((r, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (r === '全部' ? ' active' : '');
+    chip.textContent = (i > 0 ? ROLE_ICONS[i] + ' ' : '') + r;
+    chip.onclick = () => { activeRole = r; updateChips(rf, chip); filterAll(); };
+    rf.appendChild(chip);
+  });
+}
+
+function updateChips(container, active) {
+  container.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  active.classList.add('active');
+}
+
+function filterAll() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const filtered = DATA.filter(d => {
+    if (activeRole !== '全部' && d.role !== activeRole) return false;
+    if (q && !d.tc_id.toLowerCase().includes(q) && !d.title.toLowerCase().includes(q) && !d.role.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderCards(filtered);
+}
+
+function scenarioClass(sc) {
+  if (!sc) return '';
+  if (sc.includes('S1')) return 'tag-s1';
+  if (sc.includes('S2')) return 'tag-s2';
+  if (sc.includes('S3')) return 'tag-s3';
+  if (sc.includes('S4')) return 'tag-s4';
+  return '';
+}
+
+function isCoreCase(d) {
+  return d.cat && d.cat.includes('基础三项');
+}
+
+function renderCards(filtered) {
+  const main = document.getElementById('mainContent');
+  document.getElementById('countShown').textContent = filtered.length;
+  const coreCount = DATA.filter(d => isCoreCase(d)).length;
+  document.getElementById('countCore').textContent = coreCount;
+
+  if (filtered.length === 0) {
+    main.innerHTML = '<div class="empty"><div class="empty-icon">🔎</div><div style="font-size:15px;color:#94a3b8;">没有符合条件的测试用例</div></div>';
+    return;
+  }
+
+  const grouped = {};
+  filtered.forEach(d => {
+    if (!grouped[d.role]) grouped[d.role] = [];
+    grouped[d.role].push(d);
+  });
+
+  const roleOrder = ROLES.slice(1);
+  let html = '';
+  roleOrder.forEach((role, ri) => {
+    if (!grouped[role]) return;
+    const items = grouped[role];
+    const theme = `theme-${ri % 8}`;
+    const icon = ROLE_ICONS[ri + 1] || '👤';
+
+    // Group by cat within role
+    const catMap = {};
+    items.forEach(d => {
+      const c = d.cat || '其他';
+      if (!catMap[c]) catMap[c] = [];
+      catMap[c].push(d);
+    });
+
+    let catHtml = '';
+    for (const [cat, catItems] of Object.entries(catMap)) {
+      const cards = catItems.map(d => {
+        const isCore = isCoreCase(d);
+        const fieldNote = d.field_note ? `<div class="field-pending">⏳ 待确认：${d.field_note}</div>` : '';
+        const extraTag = d.cat && d.cat.includes('额外') ? `<span class="meta-tag tag-extra">🔑 额外操作</span>` : '';
+        const coreBadge = isCore ? `<span class="core-badge">★ 核心</span>` : '';
+        const r = results[d.tc_id] || {};
+        const resultVal = r.status || '';
+        const resultBadge = resultVal ? getBadge(resultVal) : '<span class="result-badge badge-pending">待测试</span>';
+        const remarkVal = r.remark || '';
+        const remarkVisible = resultVal ? 'visible' : '';
+        return `
+          <div class="card" id="card-${d.tc_id}" onclick="toggleCard(this)">
+            <div class="card-top">
+              <span class="tc-id">${d.tc_id}</span>
+              <span class="card-title">${d.title}${coreBadge}${resultBadge}</span>
+              <span class="chevron">▾</span>
+            </div>
+            <div class="card-meta">
+              ${d.scenario ? `<span class="meta-tag ${scenarioClass(d.scenario)}">${d.scenario}</span>` : ''}
+              ${extraTag}
+              ${d.terminal ? `<span class="meta-tag tag-terminal">📱 ${d.terminal}</span>` : ''}
+            </div>
+            ${fieldNote}
+            <div class="card-detail">
+              ${d.precondition ? `<div class="detail-section"><div class="detail-label">前置条件</div><div class="detail-content">${d.precondition}</div></div>` : ''}
+              ${d.data_needed ? `<div class="detail-section"><div class="detail-label">需准备的数据</div><div class="detail-content">${d.data_needed}</div></div>` : ''}
+              ${d.steps ? `<div class="detail-section"><div class="detail-label">测试步骤</div><div class="detail-content">${d.steps}</div></div>` : ''}
+              ${d.expected ? `<div class="detail-section"><div class="detail-label">预期结果</div><div class="detail-content">${d.expected}</div></div>` : ''}
+              <div class="result-bar" onclick="event.stopPropagation()">
+                <span class="result-label">测试结果</span>
+                <button class="result-btn ${resultVal==='pass'?'active-pass':''}" data-val="pass" onclick="setResult('${d.tc_id}','pass')">✅ 通过</button>
+                <button class="result-btn ${resultVal==='fail'?'active-fail':''}" data-val="fail" onclick="setResult('${d.tc_id}','fail')">❌ 失败</button>
+              </div>
+              <textarea class="remark-area ${remarkVisible}" id="remark-${d.tc_id}" placeholder="备注（问题描述、缺陷编号等）…" onclick="event.stopPropagation()" oninput="saveRemark('${d.tc_id}',this.value)">${remarkVal}</textarea>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      catHtml += `
+        <div class="cat-label">${cat}</div>
+        <div class="cards-grid">${cards}</div>
+      `;
+    }
+
+    // Role subtitle logic
+    let subtitle = '';
+    if (role === '战区销管') subtitle = '（内容同战区Leader，额外含分派操作）';
+    if (role === '产品经理') subtitle = '（case类似区域销管，可见数据范围不同：产品维度）';
+    if (role === '区域销管') subtitle = '（case类似产品经理，可见数据范围不同：区域维度）';
+
+    const meta = ROLE_META[role] || {};
+    const roleInfoHtml = `
+      <div class="role-info">
+        <div class="role-info-item">
+          <span class="role-info-label">⚡ 能力展示</span>
+          <span class="role-info-value">${meta.abilities || '待填写'}</span>
+        </div>
+        <div class="role-info-item">
+          <span class="role-info-label">👤 测试人员</span>
+          <span class="role-info-value" contenteditable="true" style="outline:none;border-bottom:1px dashed #c0cdd8;min-width:60px;">${meta.testers || '待填写'}</span>
+        </div>
+        <div class="role-info-item">
+          <span class="role-info-label">🔗 测试地址</span>
+          <a class="role-info-link" href="${meta.testUrl || '#'}" target="_blank">${meta.testUrl || '待填写'}</a>
+        </div>
+        <div class="role-info-item">
+          <span class="role-info-label">📥 测试数据下载</span>
+          <a class="role-info-download" href="${meta.dataDownload || '#'}" target="_blank">⬇ 下载测试数据</a>
+        </div>
+      </div>
+    `;
+
+    html += `
+      <div class="role-section ${theme}">
+        <div class="role-header">
+          <div class="role-icon">${icon}</div>
+          <span class="role-title">👤 ${role}</span>
+          ${subtitle ? `<span class="role-subtitle">${subtitle}</span>` : ''}
+          <span class="role-count">${items.length} 条用例</span>
+        </div>
+        ${roleInfoHtml}
+        ${catHtml}
+      </div>
+    `;
+  });
+
+  main.innerHTML = html;
+}
+
+function toggleCard(card) {
+  card.classList.toggle('expanded');
+}
+
+buildFilters();
+loadResults().then(() => filterAll());
+</script>
+
+<!-- ================================================================
+  GOOGLE APPS SCRIPT 配置指南
+  ================================================================
+  第一步：打开 Google Sheets，新建一个表格，重命名 Sheet1 为 "Results"
+          第一行填写表头：A1=tc_id  B1=status  C1=remark  D1=updated_at  E1=updater
+
+  第二步：在 Google Sheets 菜单 → 扩展程序 → Apps Script，粘贴以下代码：
+
+  ─────────────────────────────────────────────────────────────────
+  const SHEET_NAME = 'Results';
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  function doGet(e) {
+    const action = e.parameter.action;
+    if (action === 'getAll') return getAll();
+    return ContentService.createTextOutput('ok');
+  }
+
+  function doPost(e) {
+    const body = JSON.parse(e.postData.contents);
+    if (body.action === 'upsertRows') upsertRows(body.rows);
+    return ContentService.createTextOutput('ok')
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  function getAll() {
+    const sheet = ss.getSheetByName(SHEET_NAME);
+    const rows = sheet.getDataRange().getValues();
+    const results = {};
+    for (let i = 1; i < rows.length; i++) {
+      const [tc_id, status, remark] = rows[i];
+      if (tc_id) results[tc_id] = { status: status || '', remark: remark || '' };
+    }
+    return ContentService.createTextOutput(JSON.stringify({ results }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  function upsertRows(rows) {
+    const sheet = ss.getSheetByName(SHEET_NAME);
+    const data = sheet.getDataRange().getValues();
+    const idxMap = {};
+    for (let i = 1; i < data.length; i++) idxMap[data[i][0]] = i + 1;
+    const now = new Date().toLocaleString('zh-CN');
+    Object.entries(rows).forEach(([tcId, r]) => {
+      const row = [tcId, r.status || '', r.remark || '', now, ''];
+      if (idxMap[tcId]) {
+        sheet.getRange(idxMap[tcId], 1, 1, 5).setValues([row]);
+      } else {
+        sheet.appendRow(row);
+      }
+    });
+  }
+  ─────────────────────────────────────────────────────────────────
+
+  第三步：点击"部署" → "新建部署" → 类型选"网页应用"
+          执行身份：选"我"
+          访问权限：选"所有人"（如需内部限制可选"组织内所有人"）
+          点击"部署"，复制生成的 Web App URL
+
+  第四步：将 URL 粘贴到本 HTML 文件顶部：
+          const GAS_URL = '粘贴到这里';
+
+  第五步：将 HTML 文件部署到任意静态服务器（GitHub Pages / Nginx / 内网服务器均可）
+          所有打开链接的人填写的数据都会自动写入 Google Sheets，实时共享。
+  ================================================================ -->
+</body>
+</html>
